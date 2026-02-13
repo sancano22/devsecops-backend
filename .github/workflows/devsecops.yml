@@ -12,9 +12,9 @@ jobs:
       id-token: write
 
     env:
-      PROJECT_ID: ${PROJECT_ID}
-      REGION: us-central1
-      REPOSITORY: microservices-repo
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      REGION: ${{ secrets.REGION }}
+      REPOSITORY: ${{ secrets.REPOSITORY }}
 
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker
-        run: gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev --quiet
 
       - name: Debug variables
         run: |
@@ -44,25 +44,25 @@ jobs:
       # Build imágenes api-gateway, academic-service, users-service
       - name: Build api-gateway
         run: |
-          docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/api-gateway:${IMAGE_TAG} ./api-gateway
+          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/api-gateway:${IMAGE_TAG} ./api-gateway
 
       - name: Build users-service
         run: |
-          docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/users-service:${IMAGE_TAG} ./users-service
+          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/users-service:${IMAGE_TAG} ./users-service
 
       - name: Build academic-service
         run: |
-          docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/academic-service:${IMAGE_TAG} ./academic-service
+          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/academic-service:${IMAGE_TAG} ./academic-service
 
       # Security Scan
       - name: Scan api-gateway
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/api-gateway:${IMAGE_TAG}
+          image-ref: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/api-gateway:${IMAGE_TAG}
 
       # Push imágenes
       - name: Push images
         run: |
-          docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/api-gateway:${IMAGE_TAG}
-          docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/users-service:${IMAGE_TAG}
-          docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/academic-service:${IMAGE_TAG}
+          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/api-gateway:${IMAGE_TAG}
+          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/users-service:${IMAGE_TAG}
+          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/academic-service:${IMAGE_TAG}
