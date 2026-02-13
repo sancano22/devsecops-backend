@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+
+  users-service:
+    image: users-service:1.0.0
+    container_name: users-service
+    environment:
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET}
+    expose:
+      - "3001"
+    networks:
+      - backend-net
+
+  academic-service:
+    image: academic-service:1.0.0
+    container_name: academic-service
+    environment:
+      - PORT=3002
+    expose:
+      - "3002"
+    networks:
+      - backend-net
+
+  api-gateway:
+    image: api-gateway:1.0.0
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET}
+      - USERS_SERVICE_URL=http://users-service:3001
+      - ACADEMIC_SERVICE_URL=http://academic-service:3002
+    depends_on:
+      - users-service
+      - academic-service
+    networks:
+      - backend-net
+
+networks:
+  backend-net:
+    driver: bridge
