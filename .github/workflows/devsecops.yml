@@ -34,6 +34,13 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
 
+      - name: Debug variables
+        run: |
+         echo "REGION=${REGION}"
+         echo "PROJECT_ID=${PROJECT_ID}"
+         echo "IMAGE_TAG=${IMAGE_TAG}"
+
+
       # Build imágenes api-gateway, academic-service, users-service
       - name: Build api-gateway
         run: |
