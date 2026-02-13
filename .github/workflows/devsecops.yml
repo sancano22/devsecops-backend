@@ -34,7 +34,7 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
 
-      # Build imágenes
+      # Build imágenes api-gateway, academic-service, users-service
       - name: Build api-gateway
         run: |
           docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/api-gateway:${IMAGE_TAG} ./api-gateway
