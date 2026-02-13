@@ -44,25 +44,25 @@ jobs:
       # Build imágenes api-gateway, academic-service, users-service
       - name: Build api-gateway
         run: |
-          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/api-gateway:${IMAGE_TAG} ./api-gateway
+          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/api-gateway:${{ secrets.IMAGE_TAG }} ./api-gateway
 
       - name: Build users-service
         run: |
-          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/users-service:${IMAGE_TAG} ./users-service
+          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/users-service:${{ secrets.IMAGE_TAG }} ./users-service
 
       - name: Build academic-service
         run: |
-          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/academic-service:${IMAGE_TAG} ./academic-service
+          docker build -t ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/academic-service:${{ secrets.IMAGE_TAG }} ./academic-service
 
       # Security Scan
       - name: Scan api-gateway
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/api-gateway:${IMAGE_TAG}
+          image-ref: ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/api-gateway:${{ secrets.IMAGE_TAG }}
 
       # Push imágenes
       - name: Push images
         run: |
-          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/api-gateway:${IMAGE_TAG}
-          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/users-service:${IMAGE_TAG}
-          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/academic-service:${IMAGE_TAG}
+          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/api-gateway:${{ secrets.IMAGE_TAG }}
+          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/users-service:${{ secrets.IMAGE_TAG }}
+          docker push ${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.REPOSITORY }}/academic-service:${{ secrets.IMAGE_TAG }}
