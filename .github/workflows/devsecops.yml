@@ -1,0 +1,61 @@
+name: Backend CI
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      PROJECT_ID: terraform-lab-487221
+      REGION: us-central1
+      REPOSITORY: microservices-repo
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set IMAGE_TAG
+        run: echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+
+      # 🔐 Autenticación GCP
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+
+      # 🐳 Build imágenes
+      - name: Build api-gateway
+        run: |
+          docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/api-gateway:${IMAGE_TAG} ./api-gateway
+
+      - name: Build users-service
+        run: |
+          docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/users-service:${IMAGE_TAG} ./users-service
+
+      - name: Build academic-service
+        run: |
+          docker build -t ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/academic-service:${IMAGE_TAG} ./academic-service
+
+      # 🔍 Security Scan
+      - name: Scan api-gateway
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/api-gateway:${IMAGE_TAG}
+
+      # 🚀 Push imágenes
+      - name: Push images
+        run: |
+          docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/api-gateway:${IMAGE_TAG}
+          docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/users-service:${IMAGE_TAG}
+          docker push ${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/academic-service:${IMAGE_TAG}
